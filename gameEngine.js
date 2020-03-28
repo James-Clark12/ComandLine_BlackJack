@@ -7,6 +7,8 @@ export class GameEngine{
   constructor() {
     this.deck;
     this.playerHand;
+    this.playerFunds = 10000;
+    this.stake = 0;
     this.dealerHand;
     this.gameOver;
     this.playing;
@@ -17,10 +19,21 @@ export class GameEngine{
   showBlackJackResults(playerHasBlackJack, dealerHasBlackJack) {
     if (playerHasBlackJack && dealerHasBlackJack) {
       console.log("Both players have blackjack! Draw!");
+      if (this.stake > 0) {
+        console.log(`Player receives his stake of ${this.stake} back`);
+        this.playerFunds = this.playerFunds + (this.stake);
+      }
     } else if (playerHasBlackJack) {
       console.log("You have blackjack! You win!");
+      if (this.stake > 0) {
+        console.log(`Player doubles his stake of ${this.stake}`);
+        this.playerFunds = this.playerFunds + (2*this.stake);
+      }
     } else if (dealerHasBlackJack) {
       console.log("Dealer has blackjack! Dealer wins!");
+      if (this.stake > 0) {
+        console.log(`Player loses his stake of ${this.stake}`);
+      }
     }
   }
 
@@ -48,6 +61,19 @@ export class GameEngine{
     this.playing = true;
 
     while(this.playing===true) {
+
+      let wantToStake = readlineSync.question(`Would you like to place a stake on this round?, you currently have ${this.playerFunds} available. \n\n`);
+      if (['y', 'yes', 'Y', 'Yes'].includes(wantToStake)) {
+        let stake = readlineSync.question('Enter your desired stake as an integer \n\n');
+        console.log(parseInt(stake));
+        this.stake=(parseInt(stake));
+        this.playerFunds = this.playerFunds - this.stake;
+        console.log(`${stake} accepted.`);
+      } else {
+        console.log('\n We can begin then');
+        this.stake = 0;
+      }
+
       this.deck = new Deck();
       this.deck.shuffle();
 
@@ -82,6 +108,9 @@ export class GameEngine{
           this.playerHand.display();
           if (this.playerIsOver()) {
             console.log('Player is bust');
+            if (this.stake > 0) {
+              console.log(`Player loses his stake of ${this.stake}`);
+            }
             let dealerHandValue = this.dealerHand.getValue();
             console.log("Dealer's hand was: ", dealerHandValue);
             this.gameOver = true;
@@ -104,7 +133,11 @@ export class GameEngine{
           if (dealerHandValue > 21) {
             console.log('Dealer has gone bust');
             console.log('Player wins');
-            this.gameOver = true;
+            if (this.stake > 0) {
+              console.log(`Player doubles his stake of ${this.stake}`);
+              this.playerFunds = this.playerFunds + this.stake;
+              this.gameOver = true;
+            }
           } else {
             console.log('Results of this round are...');
             console.log('Player hand is: ', playerHandValue);
@@ -112,12 +145,23 @@ export class GameEngine{
 
             if (playerHandValue > dealerHandValue) {
               console.log('Player wins');
+              if (this.stake > 0) {
+                console.log(`Player doubles his stake of ${this.stake}`);
+                this.playerFunds = this.playerFunds + (2*this.stake);
+              }
             } else if (playerHandValue === dealerHandValue) {
               console.log("It's a tie");
+              if (this.stake > 0) {
+                console.log(`Player receives his stake of ${this.stake} back`);
+                this.playerFunds = this.playerFunds + (this.stake);
+              }
             } else {
               console.log('Dealer wins');
+              if (this.stake > 0) {
+                console.log(`Player loses his stake of ${this.stake}`);
+              }
             }
-            this.gameOver = true;  
+            this.gameOver = true;
           }
         }
     }

@@ -1,11 +1,8 @@
 
-const readline = require('readline').createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
+var readlineSync = require('readline-sync');
 
-const dumbFunc = () => {
-  console.log('dd');
+function isNumeric (value) {
+  return ['2', '3', '4', '5', '6' ,'7', '8', '9', '10'].includes(value);
 }
 
 class Card {
@@ -14,10 +11,10 @@ class Card {
     this.value = value;
   }
 
-  returnCard = () => {
+  returnCard() {
     return `${this.value} of ${this.suit}`;
   }
-}
+};
 
 const possibleCardsValues = ['A', '2', '3', '4', '5', '6' ,'7', '8', '9', '10', 'J', 'Q', 'K'];
 const possibleSuits = ['Spades', 'Clubs', 'Hearts', 'Diamonds'];
@@ -28,12 +25,12 @@ class Deck {
     // create all the possible cards
     possibleSuits.forEach(suit => {
       possibleCardsValues.forEach(value => {
-        cards.push(new Card(suit, value));
+        this.cards.push(new Card(suit, value));
       })
     })
   }
 
-  fisherYatesShuffle = (array) => {
+  fisherYatesShuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
       // swap elements array[i] and array[j]
@@ -45,18 +42,18 @@ class Deck {
     }
   }
 
-  shuffle = () => {
+  shuffle() {
     if (this.cards.length > 1) {
       this.fisherYatesShuffle(this.cards);
     }
   }
 
-  deal = () => {
+  deal() {
     if(this.cards.length > 1) {
       return this.cards.pop();
     }
   }
-}
+};
 
 class Hand {
   constructor(dealer=false) {
@@ -65,7 +62,7 @@ class Hand {
     this.value = 0;
   }
 
-  display = () => {
+  display() {
     if (this.dealer === true) {
       console.log('Hidden');
       console.log(this.cards[1]);
@@ -77,20 +74,16 @@ class Hand {
     }
   }
 
-  addCard = (card) => {
+  addCard(card) {
     this.cards.push(card);
   }
 
-  isNumeric = (value) => {
-    return ['2', '3', '4', '5', '6' ,'7', '8', '9', '10'].includes(value);
-  }
-
-  calculateValue = () => {
+  calculateValue() {
     this.value = 0;
     let hasAce = false;
     // add up value of cards ** easier to just attach an int value to each card - make them objects
     this.cards.forEach(card => {
-      if(card.value.isNumeric()) {
+      if(isNumeric(card.value)) {
         this.value = this.value + parseInt(card.value);
       } else {
         if (card.value === 'A') {
@@ -107,11 +100,11 @@ class Hand {
     }
   }
 
-  getValue = () => {
+  getValue() {
     this.calculateValue();
     return this.value;
   }
-}
+};
 
 // seems fairly robust above here - maybe the parseInt might be problematic
 
@@ -127,7 +120,7 @@ class Game {
     this.dealerHasBlackJack;
   }
 
-  showBlackJackResults = (playerHasBlackJack, dealerHasBlackJack) => {
+  showBlackJackResults(playerHasBlackJack, dealerHasBlackJack) {
     if (playerHasBlackJack && dealerHasBlackJack) {
       console.log("Both players have blackjack! Draw!");
     } else if (playerHasBlackJack) {
@@ -137,7 +130,7 @@ class Game {
     }
   }
 
-  checkForBlackJack = (player) => {
+  checkForBlackJack(player) {
     if (player === 'player') {
       let player = false;
       if (this.playerHand.getValue() === 21) {
@@ -153,11 +146,11 @@ class Game {
     }
   }
 
-  playerIsOver = () => {
+  playerIsOver() {
     return this.playerHand.getValue() > 21;
   }
 
-  play = () => {
+  play() {
     this.playing = true;
 
     while(this.playing===true) {
@@ -169,7 +162,7 @@ class Game {
 
       for(let i=0; i<2; i++) {
         this.playerHand.addCard(this.deck.deal());
-        this.playerHand.addCard(this.deck.deal());
+        this.dealerHand.addCard(this.deck.deal());
       }
 
       console.log('Your hand is: ');
@@ -179,7 +172,7 @@ class Game {
 
       this.gameOver = false;
 
-      while(this.gameOver !== false) {
+      while(this.gameOver !== true) {
         this.playerHasBlackJack = this.checkForBlackJack('player');
         this.dealerHasBlackJack = this.checkForBlackJack('dealer');
         if (this.playerHasBlackJack || this.dealerHasBlackJack) {
@@ -187,15 +180,10 @@ class Game {
           this.showBlackJackResults(this.playerHasBlackJack, this.dealerHasBlackJack);
           break;
         }
+        // it's not making it to here for some bugged reason
+        let choice = readlineSync.question('Please choose [Hit / Stick] \n\n');
 
-
-        let choice = '';
-        readline.question(`Please choose [Hit / Stick]`, (name) => {
-          choice = name;
-          readline.close()
-        })
-
-        if ['hit', 'Hit', 'h'].includes(choice) {
+        if (['hit', 'Hit', 'h'].includes(choice)) {
           this.playerHand.addCard(this.deck.deal());
           this.playerHand.display();
           if (this.playerIsOver()) {
@@ -221,21 +209,17 @@ class Game {
           this.gameOver = true;
         }
     }
-    let again = 'No';
-    readline.question(`Play another round?`, (answer) => {
-      again = answer;
-      readline.close()
-    })
+    let again = readlineSync.question('Play another round? \n\n');
     if (['y', 'yes', 'Y', 'Yes'].includes(again)) {
-      console.log('Next round...');
+      console.log('\n Next round...');
       this.gameOver = false;
     } else {
-      console.log('Thanks for playing!');
+      console.log('\n Thanks for playing!');
       this.playing = false;
     }
     }
   }
-}
+};
 
 const game = new Game();
 game.play();

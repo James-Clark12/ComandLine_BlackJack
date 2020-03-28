@@ -82,6 +82,8 @@ export class GameEngine{
           this.playerHand.display();
           if (this.playerIsOver()) {
             console.log('Player is bust');
+            let dealerHandValue = this.dealerHand.getValue();
+            console.log("Dealer's hand was: ", dealerHandValue);
             this.gameOver = true;
           }
         } else {
@@ -89,18 +91,34 @@ export class GameEngine{
           let playerHandValue = this.playerHand.getValue();
           let dealerHandValue = this.dealerHand.getValue();
 
-          console.log('Results of this round are...');
-          console.log('Player hand is: ', playerHandValue);
           console.log("Dealer's hand is: ", dealerHandValue);
 
-          if (playerHandValue > dealerHandValue) {
-            console.log('Player wins');
-          } else if (playerHandValue === dealerHandValue) {
-            console.log("It's a tie");
-          } else {
-            console.log('Dealer wins');
+          // dealer shold hit if below 17
+          while(dealerHandValue < 17 && dealerHandValue < 22) {
+            console.log('Dealer will hit');
+            this.dealerHand.addCard(this.deck.deal());
+            dealerHandValue = this.dealerHand.getValue();
+            console.log("Dealer's hand is now: ", dealerHandValue);
           }
-          this.gameOver = true;
+
+          if (dealerHandValue > 21) {
+            console.log('Dealer has gone bust');
+            console.log('Player wins');
+            this.gameOver = true;
+          } else {
+            console.log('Results of this round are...');
+            console.log('Player hand is: ', playerHandValue);
+            console.log("Dealer's hand is: ", dealerHandValue);
+
+            if (playerHandValue > dealerHandValue) {
+              console.log('Player wins');
+            } else if (playerHandValue === dealerHandValue) {
+              console.log("It's a tie");
+            } else {
+              console.log('Dealer wins');
+            }
+            this.gameOver = true;  
+          }
         }
     }
     let again = readlineSync.question('Play another round? \n\n');

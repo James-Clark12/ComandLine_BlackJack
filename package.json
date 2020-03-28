@@ -1,0 +1,30 @@
+{
+  "name": "cl_bj",
+  "version": "1.0.0",
+  "description": "",
+  "main": "blackjack.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.0",
+    "babel-loader": "^8.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/James-Clark12/ComandLine_BlackJack.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/James-Clark12/ComandLine_BlackJack/issues"
+  },
+  "homepage": "https://github.com/James-Clark12/ComandLine_BlackJack#readme"
+}

@@ -1,0 +1,18 @@
+body {
+  background-color: #35654d;
+}
+
+.message-feed {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  height: 40%;
+  width: 30%;
+  background-color: #277714;
+  padding: 10px;
+}
+
+.hello {
+  color: red;
+  background: url("./icon.png");
+}
